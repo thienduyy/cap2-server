@@ -135,13 +135,23 @@ app.get("/api/getArea", (req, res) => {
 app.get("/api/noMaskByDate", (req, res) => {
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
-  console.log(startDate, endDate);
+  // console.log(startDate, endDate);
   const sqlSelect =
     "Select DATE_FORMAT(D.date, '%d-%m') as date, count(distinct D.id) as totalNoMask " +
     "From db_viewdata D " +
-    "Where DATE_FORMAT(D.date,'%d-%m') between ? and ? " +
+    "Where DATE_FORMAT(D.date,'%m-%d') between ? and ? " +
     "group by DATE_FORMAT(date, '%d-%m')";
   db.query(sqlSelect, [startDate, endDate], (err, data) => {
+    res.send(data);
+  });
+});
+
+app.get("/api/noMaskByMonth", (req, res) => {
+  const sqlSelect =
+    "Select DATE_FORMAT(D.date, '%m') as date, count(distinct D.id) as totalNoMask " +
+    "From db_viewdata D Where DATE_FORMAT(D.date,'%m') between '01' and '12' " +
+    "group by DATE_FORMAT(date, '%m') ";
+  db.query(sqlSelect, (err, data) => {
     res.send(data);
   });
 });
