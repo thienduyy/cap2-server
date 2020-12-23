@@ -27,7 +27,7 @@ app.get("/api/getEmployee", (req, res) => {
     "FROM db_people ";
   db.query(sqlSelect, (err, data) => {
     res.send(data);
-    console.log(err);
+    // console.log(err);
   });
 });
 
@@ -42,7 +42,7 @@ app.get("/api/getFilterNoMask", (req, res) => {
     "SELECT D.stt,D.id, D.user_name, DATE_FORMAT(D.date, '%Y-%m-%d %H:%i:%s') as date,E.gender,E.area, E.country,E.phone, DATE_FORMAT(E.dateOfBirth, '%d/%m/%Y') as birthday, concat(' ',D.id,D.user_name,E.gender,E.country,E.area,E.phone,' ') as filter " +
     "FROM db_people E Inner Join db_viewdata D on E.id = D.id ";
   db.query(sqlSelect, (err, data) => {
-    console.log(err);
+    // console.log(err);
     res.send(data);
   });
 });
@@ -55,7 +55,7 @@ app.get("/api/getFilterMask", (req, res) => {
     "Where E.id NOT IN ( Select D.id From db_viewdata D " +
     " Where (D.id IS NOT NULL) AND (DATE_FORMAT(D.date,'%Y-%m-%d') = ? ))";
   db.query(sqlSelect, [startDate], (err, data) => {
-    console.log(err);
+    // console.log(err);
     res.send(data);
   });
 });
@@ -64,7 +64,7 @@ app.delete("/api/deleteEmployee/:id", (req, res) => {
   const id = req.params.id;
   const sqlSelect = "Delete From db_people Where id = ? ";
   db.query(sqlSelect, [id], (err, data) => {
-    console.log(err);
+    // console.log(err);
   });
 });
 
@@ -82,7 +82,7 @@ app.put("/api/updateEmployee", (req, res) => {
     sqlSelect,
     [user_name, gender, dateOfBirth, country, area, phone, id],
     (err, data) => {
-      console.log(err);
+      // console.log(err);
       // console.log(data);
     }
   );
@@ -103,7 +103,7 @@ app.get("/api/totalNoMask", (req, res) => {
     "Select Count(distinct id) As total  From db_viewdata Where date Like ?";
   db.query(sqlSelect, [date], (err, data) => {
     res.send(data);
-    console.log(err);
+    // console.log(err);
   });
 });
 app.get("/api/listNoMask", (req, res) => {
@@ -114,7 +114,7 @@ app.get("/api/listNoMask", (req, res) => {
     "Select D.id,D.user_name,DATE_FORMAT(D.date, '%Y-%m-%d %H:%i:%s') as date,E.area  From db_people E Inner Join db_viewdata D on E.id = D.id Where date Like ?";
   db.query(sqlSelect, [date], (err, data) => {
     res.send(data);
-    console.log(err);
+    // console.log(err);
   });
 });
 
@@ -155,6 +155,29 @@ app.get("/api/noMaskByMonth", (req, res) => {
     res.send(data);
   });
 });
+
+app.post("/api/login", (req, res) => {
+  const user_name = req.body.user_name;
+  const password = req.body.password;
+  // const user_name = "admin";
+  // const password = "admin";
+  const sqlSelect = "select * from db_login where user_name = ? and password = ?";
+  db.query(sqlSelect, [user_name, password], (err, data) => {
+    // res.send(data);
+    // console.log(err)
+    if (err) {
+      res.send({ err: err });
+      console.log(err)
+    }
+
+    if (data.length > 0) {
+      res.send(data);
+    }
+    else {
+      res.send({ message: "Wrong username or password combination!" })
+    }
+  })
+})
 
 // app.get("/api")
 
